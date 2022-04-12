@@ -6,6 +6,7 @@ const initialState = {
   openedCards: [],
   cardsGuessed: 0,
   isGameStart: false,
+  isLocalTimer: false,
   timerId: undefined,
   intervalId: undefined,
   cards: [
@@ -18,7 +19,7 @@ const initialState = {
     { id: 7, isOpen: false, value: "динозавр", isOnBoard: true },
     { id: 8, isOpen: false, value: "динозавр", isOnBoard: true },
     { id: 9, isOpen: false, value: "мышь", isOnBoard: true },
-    { id: 10, isOpen: false, value: "мышь", isOnBoard: true, isOnBoard: true },
+    { id: 10, isOpen: false, value: "мышь", isOnBoard: true },
     { id: 11, isOpen: false, value: "птица", isOnBoard: true },
     { id: 12, isOpen: false, value: "птица", isOnBoard: true },
     { id: 13, isOpen: false, value: "змея", isOnBoard: true },
@@ -39,6 +40,9 @@ const cardSlice = createSlice({
         }
         return card;
       });
+    },
+    setLocalTimer: (state, action) => {
+      state.isLocalTimer = action.payload;
     },
     addCardToOpen: (state, action) => {
       state.openedCards = [...state.openedCards, action.payload];
@@ -61,12 +65,11 @@ const cardSlice = createSlice({
         if (action.payload.some((id) => id === card.id)) {
           card.isOnBoard = false;
         }
-
         return card;
       });
     },
     setGameTimer: (state, action) => {
-        state.gameTimer = action.payload;
+      state.gameTimer = action.payload;
     },
     resetGame: (state, action) => {
       state.cardsGuessed = 0;
@@ -98,7 +101,27 @@ export const {
   resetGame,
   setTimerId,
   setIntervalId,
+  setLocalTimer,
 } = cardSlice.actions;
+
+const addCardsToGuessedThunk = (id1, id2) => {
+  return (dispatch) => {
+    dispatch(toggleBlockedInterface(true));
+    setTimeout(() => {
+      dispatch(addCardToGuessedCard(id1, id2));
+      dispatch(toggleBlockedInterface(false));
+    }, 1000);
+  };
+};
+const closeAllCardsThunk = () => {
+  return (dispatch) => {
+    dispatch(toggleBlockedInterface(true));
+    setTimeout(() => {
+      dispatch(closeAllCard());
+      dispatch(toggleBlockedInterface(false));
+    }, 1000);
+  };
+};
 
 export const startGame = () => {
   return (dispatch, getState) => {
@@ -110,6 +133,41 @@ export const startGame = () => {
       dispatch(setGameTimer(gameTimer));
     }, 1000);
     dispatch(setTimerId(intervalId));
+  };
+};
+export const endGame = () => {
+  return (dispatch, getState) => {
+    let intervalId = getState().card.intervalId;
+    dispatch(toggleGameStarted(false));
+    clearInterval(intervalId);
+  };
+};
+
+export const cardOpen = (id, value) => {
+  return (dispatch, getState) => {
+    dispatch(setCardOpen(id));
+    let { openedCards, cardsGuessed, isLocalTimer } = getState().card;
+    if (!isLocalTimer) {
+      dispatch(setLocalTimer(true));
+      let timerId = setTimeout(() => {
+        dispatch(setLocalTimer(false));
+        dispatch(closeAllCard());
+      }, 3000);
+      dispatch(setTimerId(timerId));
+    }
+    if (openedCards.length === 1) {
+      if (openedCards[0].value === value) {
+        dispatch(addCardsToGuessedThunk(openedCards[0].id, id));
+        if (cardsGuessed === 14) {
+          dispatch(endGame());
+        }
+      } 
+      dispatch(closeAllCardsThunk());
+      dispatch(setLocalTimer(false));
+      window.clearTimeout(getState().card.timerId);
+    } else {
+      dispatch(addCardToOpen({ id, value }));
+    }
   };
 };
 export default cardSlice.reducer;
