@@ -8,6 +8,7 @@ const CardItem = ({ data }) => {
   );
   function openCard(id, value) {
     dispatch(cardOpen(id, value));
+    console.log(id, value)
   }
   return (
     <button

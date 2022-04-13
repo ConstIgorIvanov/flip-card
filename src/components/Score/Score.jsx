@@ -1,10 +1,9 @@
 import {useSelector} from 'react-redux'
 const Score = () => {
-  const cardGueses = useSelector((state)=>state.card.cardGueses)
+  const cardsGuessed = useSelector((state) => state.card.cardsGuessed);
   return (
     <div className="header__score">
-      {cardGueses}
-      <span>/16</span>
+      {cardsGuessed} <span> /16</span>
     </div>
   );
 };

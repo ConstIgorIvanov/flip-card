@@ -52,6 +52,7 @@ const cardSlice = createSlice({
         card.isOpen = false;
         return card;
       });
+      state.openedCards = [];
     },
     toggleBlockedInterface: (state, action) => {
       state.isInterfaceBlocked = action.payload;
@@ -108,7 +109,7 @@ const addCardsToGuessedThunk = (id1, id2) => {
   return (dispatch) => {
     dispatch(toggleBlockedInterface(true));
     setTimeout(() => {
-      dispatch(addCardToGuessedCard(id1, id2));
+      dispatch(addCardToGuessedCard([id1, id2]));
       dispatch(toggleBlockedInterface(false));
     }, 1000);
   };
@@ -126,13 +127,13 @@ const closeAllCardsThunk = () => {
 export const startGame = () => {
   return (dispatch, getState) => {
     dispatch(toggleGameStarted(true));
-    dispatch(resetGame());
+    dispatch(resetGame());  
     let gameTimer = getState().card.gameTimer;
     let intervalId = setInterval(() => {
       gameTimer++;
       dispatch(setGameTimer(gameTimer));
     }, 1000);
-    dispatch(setTimerId(intervalId));
+    dispatch(setIntervalId(intervalId));
   };
 };
 export const endGame = () => {
@@ -161,13 +162,14 @@ export const cardOpen = (id, value) => {
         if (cardsGuessed === 14) {
           dispatch(endGame());
         }
-      } 
+      }
       dispatch(closeAllCardsThunk());
       dispatch(setLocalTimer(false));
       window.clearTimeout(getState().card.timerId);
     } else {
       dispatch(addCardToOpen({ id, value }));
     }
+   
   };
 };
 export default cardSlice.reducer;
