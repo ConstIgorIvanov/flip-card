@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/flip-card/static/css/main.906f6639.css",
+    "main.js": "/flip-card/static/js/main.76bce29b.js",
+    "index.html": "/flip-card/index.html",
+    "main.906f6639.css.map": "/flip-card/static/css/main.906f6639.css.map",
+    "main.76bce29b.js.map": "/flip-card/static/js/main.76bce29b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.906f6639.css",
+    "static/js/main.76bce29b.js"
+  ]
+}
