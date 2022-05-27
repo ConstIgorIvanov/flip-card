@@ -1,3 +1,3 @@
 Flip-card game.
 
-Using React ToolKit.
+Using Redux ToolKit.
